@@ -11,6 +11,21 @@ export class EndOfTurnState implements GameState {
   enter() {
     console.log("Entering End of Turn State");
     // Additional logic for entering the end of turn state
+    // This could include displaying a summary of the turn, updating UI elements, etc.
+
+    // insects count increases by 1 if turn is even (divisible by 2)
+    if (this.game.turn % 2 === 0) {
+      this.game.addInsect();
+    }
+    // decrease plant health by insects count * 2
+    this.game.plant.decreaseHp(this.game.insects.length * 2);
+
+    // decrease plant health by -5 if plant health <= 50
+    if (this.game.plant.hp <= 50) {
+      this.game.plant.decreaseHp(5);
+    }
+
+    this.game.nextTurn();
   }
 
   update(time: number, delta: number): void {

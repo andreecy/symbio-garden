@@ -6,6 +6,7 @@ import { PlayerTurnState } from "../game/PlayerTurnState";
 import { EndOfTurnState } from "../game/EndOfTurnState";
 import { FinishGameState } from "../game/FinishGameState";
 import { GameUI } from "../game/GameUI";
+import { WateringState } from "../game/WateringState";
 
 export class Game extends Scene {
   state: GameState;
@@ -23,6 +24,7 @@ export class Game extends Scene {
   endofTurnState: EndOfTurnState;
   finishState: FinishGameState;
   gameUi: GameUI;
+  wateringState: WateringState;
 
   constructor() {
     super("Game");
@@ -34,6 +36,7 @@ export class Game extends Scene {
 
     // states
     this.playerTurnState = new PlayerTurnState(this);
+    this.wateringState = new WateringState(this);
     this.endofTurnState = new EndOfTurnState(this);
     this.finishState = new FinishGameState(this);
   }
@@ -125,6 +128,7 @@ export class Game extends Scene {
     this.gameUi.create();
     this.createWateringAnimation();
 
+    // the game starts with player turn
     this.changeState(this.playerTurnState);
   }
 
@@ -148,6 +152,8 @@ export class Game extends Scene {
       this.waterCount -= 10;
       this.wateringTween.restart();
 
+      this.changeState(this.wateringState);
+
       this.time.addEvent({
         delay: 2000,
         callback: () => {
@@ -167,21 +173,13 @@ export class Game extends Scene {
     this.insects.push(insect);
   }
 
-  // end of turn, observe consequences
   endTurn() {
-    // insects count increases by 1 if turn is even (divisible by 2)
-    if (this.turn % 2 === 0) {
-      this.addInsect();
-    }
-    // decrease plant health by insects count * 2
-    this.plant.decreaseHp(this.insects.length * 2);
+    this.changeState(this.endofTurnState);
+  }
 
-    // decrease plant health by -5 if plant health <= 50
-    if (this.plant.hp <= 50) {
-      this.plant.decreaseHp(5);
-    }
-
+  nextTurn() {
     this.turn++;
+    this.changeState(this.playerTurnState);
   }
 
   update(time: number, delta: number): void {
