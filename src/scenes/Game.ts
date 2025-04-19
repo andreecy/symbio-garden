@@ -52,6 +52,8 @@ export class Game extends Scene {
     });
     this.load.image("water", "water.png");
     this.load.image("watering", "watering.png");
+    this.load.image("bug", "bug-sm.png");
+    this.load.image("observe", "observe.png");
     this.load.bitmapFont("depixel", "depixel-white.png", "depixel-white.xml");
   }
 
