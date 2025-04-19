@@ -1,18 +1,16 @@
 import { Game } from "../scenes/Game";
 
 export class GameUI {
-  debugText: Phaser.GameObjects.Text;
   waterButton: Phaser.GameObjects.Image;
-  observeButton: Phaser.GameObjects.Text;
   actionButtons: Phaser.GameObjects.Container;
-  turnText: Phaser.GameObjects.Text;
   hpBar: Phaser.GameObjects.Rectangle;
-  hpText: Phaser.GameObjects.Text;
-
   hp: number;
-  waterText: Phaser.GameObjects.Text;
   uiContainer: Phaser.GameObjects.Container;
-  insectText: Phaser.GameObjects.Text;
+  turnText: Phaser.GameObjects.BitmapText;
+  hpText: Phaser.GameObjects.BitmapText;
+  waterText: Phaser.GameObjects.BitmapText;
+  insectText: Phaser.GameObjects.BitmapText;
+  observeButton: Phaser.GameObjects.BitmapText;
 
   constructor(private game: Game) {
     this.hp = 0;
@@ -24,19 +22,8 @@ export class GameUI {
 
     this.uiContainer = this.game.add.container(0, 0).setDepth(20);
 
-    this.debugText = this.game.add
-      .text(16, height - 16, "", {
-        font: "12px",
-      })
-      .setOrigin(0, 1);
-    this.uiContainer.add(this.debugText);
-
     this.turnText = this.game.add
-      .text(width / 2, 8, `Turn ${this.game.turn}`, {
-        font: "11px",
-        backgroundColor: "#333",
-        padding: { x: 6, y: 3 },
-      })
+      .bitmapText(width / 2, 8, "depixel", `Turn ${this.game.turn}`, 8)
       .setOrigin(0.5, 0);
     this.uiContainer.add(this.turnText);
 
@@ -53,9 +40,7 @@ export class GameUI {
     this.uiContainer.add(this.hpBar);
 
     this.hpText = this.game.add
-      .text(8 + 100 / 2, 8 + 10 / 2, "100/100", {
-        font: "10px",
-      })
+      .bitmapText(8 + 100 / 2, 8 + 10 / 2, "depixel", "100/100", 8)
       .setOrigin(0.5, 0.5);
     this.uiContainer.add(this.hpText);
 
@@ -65,10 +50,7 @@ export class GameUI {
       .setScale(0.5);
 
     this.waterText = this.game.add
-      .text(waterIcon.x, 8, "50", {
-        font: "14px",
-        padding: { x: 4, y: 2 },
-      })
+      .bitmapText(waterIcon.x, 8, "depixel", "50", 8)
       .setOrigin(0, 0);
 
     const bugIcon = this.game.add
@@ -77,10 +59,7 @@ export class GameUI {
       .setOrigin(1, 0);
 
     this.insectText = this.game.add
-      .text(bugIcon.x, 36, "0", {
-        font: "14px",
-        padding: { x: 4, y: 2 },
-      })
+      .bitmapText(bugIcon.x, 36, "depixel", "0", 8)
       .setOrigin(0, 0);
 
     this.uiContainer.add([waterIcon, this.waterText, bugIcon, this.insectText]);
@@ -88,12 +67,15 @@ export class GameUI {
     this.actionButtons = this.game.add.container(0, 0).setDepth(10);
 
     const giveWaterText = this.game.add
-      .text(width - 16, height - 16 - 16 - 32 - 16, "Give Water", {
-        font: "12px",
-        padding: { x: 8, y: 4 },
-      })
+      .bitmapText(
+        width - 64,
+        height - 16 - 16 - 32 - 16,
+        "depixel",
+        "Give Water",
+        8
+      )
       .setVisible(false)
-      .setOrigin(1, 0.5);
+      .setOrigin(0.5, 0.5);
     this.actionButtons.add(giveWaterText);
 
     // water button
@@ -128,15 +110,11 @@ export class GameUI {
 
     // do nothing button
     this.observeButton = this.game.add
-      .text(width - 16 - 52, height - 16 - 16, "Observe", {
-        font: "14px",
-        backgroundColor: "#333",
-        padding: { x: 10, y: 10 },
-      })
+      .bitmapText(width - 16 - 52, height - 16 - 16, "depixel", "Observe", 8)
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
       .on("pointerover", () => {
-        this.observeButton.setBackgroundColor("#444");
+        // this.observeButton.setBackgroundColor("#444");
         this.game.tweens.add({
           targets: this.observeButton,
           scale: 1.1,
@@ -144,7 +122,7 @@ export class GameUI {
         });
       })
       .on("pointerout", () => {
-        this.observeButton.setBackgroundColor("#333");
+        // this.observeButton.setBackgroundColor("#333");
         this.game.tweens.add({
           targets: this.observeButton,
           scale: 1,
