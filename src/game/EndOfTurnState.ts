@@ -1,7 +1,12 @@
+import { Game } from "../scenes/Game";
 import { GameState } from "./GameState";
 
 export class EndOfTurnState implements GameState {
-  constructor() {}
+  game: Game;
+
+  constructor(game: Game) {
+    this.game = game;
+  }
 
   enter() {
     console.log("Entering End of Turn State");

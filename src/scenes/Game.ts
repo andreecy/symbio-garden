@@ -1,25 +1,41 @@
 import { Scene } from "phaser";
 import { Plant } from "../Plant";
 import { Insect } from "../Insect";
+import { GameState } from "../game/GameState";
+import { PlayerTurnState } from "../game/PlayerTurnState";
+import { EndOfTurnState } from "../game/EndOfTurnState";
+import { FinishGameState } from "../game/FinishGameState";
+import { GameUI } from "../game/GameUI";
 
 export class Game extends Scene {
+  state: GameState;
   turn: number;
   plant: Plant;
   waterCount: number;
-  debugText: Phaser.GameObjects.Text;
   insects: Insect[];
   watterButton: Phaser.GameObjects.Image;
   endTurnButton: Phaser.GameObjects.Text;
   waterParticle: Phaser.GameObjects.Particles.ParticleEmitter;
   wateringImage: Phaser.GameObjects.Image;
   wateringTween: Phaser.Tweens.TweenChain;
+  // states
+  playerTurnState: PlayerTurnState;
+  endofTurnState: EndOfTurnState;
+  finishState: FinishGameState;
+  gameUi: GameUI;
 
   constructor() {
     super("Game");
-
     this.turn = 1;
     this.insects = [];
     this.waterCount = 50;
+
+    this.gameUi = new GameUI(this);
+
+    // states
+    this.playerTurnState = new PlayerTurnState(this);
+    this.endofTurnState = new EndOfTurnState(this);
+    this.finishState = new FinishGameState(this);
   }
 
   preload() {
@@ -35,71 +51,7 @@ export class Game extends Scene {
     this.load.image("watering", "watering.png");
   }
 
-  create() {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
-
-    // background
-    this.add.image(width / 2, height / 2, "land");
-
-    // plant
-    this.plant = new Plant(this, width / 2, height / 2, 50);
-
-    const container = this.add.container(0, 0).setDepth(10);
-
-    this.debugText = this.add
-      .text(16, height - 16, "", {
-        font: "14px",
-      })
-      .setOrigin(0, 1);
-
-    container.add(this.debugText);
-
-    const giveWaterText = this.add
-      .text(width - 16, height - 16 - 16 - 32 - 16, "Give Water", {
-        font: "14px",
-        padding: { x: 8, y: 4 },
-      })
-      .setVisible(false)
-      .setOrigin(1, 0.5);
-    container.add(giveWaterText);
-
-    // water button
-    this.watterButton = this.add
-      .image(width - 64 - 12, height - 128, "watering")
-      .setOrigin(0.5, 0.5)
-      .setTint(0xeeeeee)
-      .setInteractive({ useHandCursor: true })
-      .on("pointerover", () => {
-        this.watterButton.setTint(0xffffff);
-        giveWaterText.setVisible(true);
-      })
-      .on("pointerout", () => {
-        this.watterButton.setTint(0xeeeeee);
-        giveWaterText.setVisible(false);
-      })
-      .on("pointerdown", () => {
-        this.giveWater();
-      });
-
-    container.add(this.watterButton);
-
-    // do nothing button
-    this.endTurnButton = this.add
-      .text(width - 16, height - 16 - 16, "Do Nothing", {
-        font: "14px",
-        backgroundColor: "#333",
-        padding: { x: 10, y: 10 },
-      })
-      .setOrigin(1, 0.5)
-      .setInteractive({ useHandCursor: true })
-      .on("pointerdown", () => {
-        // do nothing
-        this.endTurn();
-      });
-
-    container.add(this.endTurnButton);
-
+  createWateringAnimation() {
     // add water rain particles emmiter
     this.waterParticle = this.add
       .particles(this.plant.x, this.plant.y - 128, "water", {
@@ -160,6 +112,30 @@ export class Game extends Scene {
       .pause();
   }
 
+  create() {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // background
+    this.add.image(width / 2, height / 2, "land");
+
+    // plant
+    this.plant = new Plant(this, width / 2, height / 2, 50);
+
+    this.gameUi.create();
+    this.createWateringAnimation();
+
+    this.changeState(this.playerTurnState);
+  }
+
+  changeState(state: GameState) {
+    if (this.state) {
+      this.state.exit();
+    }
+    this.state = state;
+    this.state.enter();
+  }
+
   // give water to plant
   // water count decreases by 10
   // plant gains health by 20
@@ -209,9 +185,12 @@ export class Game extends Scene {
   }
 
   update(time: number, delta: number): void {
-    this.debugText.setText(
-      `Turn: ${this.turn}\nPlant hp: ${this.plant.hp}\nInsects: ${this.insects.length}\nWater: ${this.waterCount}`,
-    );
+    this.gameUi.update({
+      turn: this.turn,
+      plant: this.plant,
+      insects: this.insects,
+      waterCount: this.waterCount,
+    });
 
     this.insects.forEach((insect) => insect.update(time, delta));
   }

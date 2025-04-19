@@ -1,6 +1,13 @@
+import { Game } from "../scenes/Game";
 import { GameState } from "./GameState";
 
 export class PlayerTurnState implements GameState {
+  game: Game;
+
+  constructor(game: Game) {
+    this.game = game;
+  }
+
   enter(): void {
     console.log("Entering Player Turn State");
     // Additional logic for entering the player turn state
