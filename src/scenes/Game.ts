@@ -126,6 +126,7 @@ export class Game extends Scene {
     this.plant = new Plant(this, width / 2, height / 2, 50);
 
     this.gameUi.create();
+    this.gameUi.setHp(this.plant.hp);
     this.createWateringAnimation();
 
     // the game starts with player turn
@@ -158,6 +159,7 @@ export class Game extends Scene {
         delay: 2000,
         callback: () => {
           this.plant.increaseHp(20);
+          this.gameUi.setHp(this.plant.hp);
           this.endTurn();
         },
       });

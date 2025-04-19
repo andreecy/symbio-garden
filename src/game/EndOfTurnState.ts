@@ -19,10 +19,12 @@ export class EndOfTurnState implements GameState {
     }
     // decrease plant health by insects count * 2
     this.game.plant.decreaseHp(this.game.insects.length * 2);
+    this.game.gameUi.setHp(this.game.plant.hp);
 
     // decrease plant health by -5 if plant health <= 50
     if (this.game.plant.hp <= 50) {
       this.game.plant.decreaseHp(5);
+      this.game.gameUi.setHp(this.game.plant.hp);
     }
 
     this.game.nextTurn();
