@@ -42,7 +42,7 @@ export class GameUI {
     this.uiContainer.add(this.hpBar);
 
     this.hpText = this.game.add
-      .bitmapText(8 + 100 / 2, 8 + 10 / 2, "pixelfont", "100/100")
+      .bitmapText(8 + 100 / 2, 14, "pixelfont", "100/100")
       .setOrigin(0.5, 0.5);
     this.uiContainer.add(this.hpText);
 
@@ -84,7 +84,7 @@ export class GameUI {
         const y = this.waterButton.getBounds().top + 12;
         const w = 120;
         const h = 48;
-        const text = "Give water to the plant";
+        const text = "Give water\nHeal: +20 HP\nCost: -10 water";
         this.setTooltip(x, y, w, h, text);
         this.showTooltip(true);
       })
@@ -100,12 +100,13 @@ export class GameUI {
         this.showTooltip(false);
       })
       .on("pointerdown", () => {
+        this.game.sound.play("click");
         this.game.giveWater();
       });
 
     this.actionButtons.add(this.waterButton);
 
-    // do nothing button
+    // observe button
     this.observeButton = this.game.add
       .image(width - 56, height - 48, "observe")
       // .bitmapText(width - 16 - 52, height - 16 - 16, "pixelfont", "Observe", 8)
@@ -137,7 +138,7 @@ export class GameUI {
         this.showTooltip(false);
       })
       .on("pointerdown", () => {
-        // do nothing
+        this.game.sound.play("click");
         this.game.observe();
       });
 

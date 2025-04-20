@@ -51,6 +51,10 @@ export class EndOfTurnState implements GameState {
       this.game.gameUi.showTooltip(true);
     }
 
+    if (insectDamage > 0 || lackOfWaterDamage > 0) {
+      this.game.sound.play("hit");
+    }
+
     this.game.nextTurn();
   }
 

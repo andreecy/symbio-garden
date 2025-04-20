@@ -59,6 +59,11 @@ export class Game extends Scene {
     this.load.image("observe", "observe.png");
     this.load.bitmapFont("pixelfont", "minogram_6x10.png", "minogram_6x10.xml");
     this.load.bitmapFont("pixelfontBold", "thick_8x8.png", "thick_8x8.xml");
+
+    this.load.audio("click", "audio/click.wav");
+    this.load.audio("heal", "audio/heal.wav");
+    this.load.audio("watering", "audio/watering.mp3");
+    this.load.audio("hit", "audio/hit.wav");
   }
 
   createWateringAnimation() {
@@ -159,6 +164,7 @@ export class Game extends Scene {
     if (this.waterCount >= 10) {
       this.waterCount -= 10;
       this.wateringTween.restart();
+      this.sound.play("watering");
 
       this.changeState(this.wateringState);
 
@@ -167,7 +173,14 @@ export class Game extends Scene {
         callback: () => {
           this.plant.increaseHp(20);
           this.gameUi.setHp(this.plant.hp);
-          this.endTurn();
+          this.sound.play("heal");
+
+          this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+              this.endTurn();
+            },
+          });
         },
       });
     }
