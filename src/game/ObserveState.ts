@@ -9,17 +9,17 @@ export class ObserveState implements GameState {
   }
 
   enter() {
-    console.log("Entering Observe State");
+    // console.log("Entering Observe State");
     // Additional logic for entering the observe state
   }
 
   update(time: number, delta: number): void {
-    console.log("Updating Observe State");
+    // console.log("Updating Observe State");
     // Additional logic for updating the observe state
   }
 
   exit() {
-    console.log("Exiting Observe State");
+    // console.log("Exiting Observe State");
     // Additional logic for exiting the observe state
   }
 }

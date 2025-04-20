@@ -16,6 +16,8 @@ export class GameUI {
   tooltipText: Phaser.GameObjects.BitmapText;
   levelText: Phaser.GameObjects.BitmapText;
   levelConfig: import("/home/anzz/dev/symbio-garden/src/level").LevelConfig;
+  menuContainer: Phaser.GameObjects.Container;
+  levelTitle: Phaser.GameObjects.BitmapText;
 
   constructor(private game: Game) {
     this.hp = 0;
@@ -25,6 +27,7 @@ export class GameUI {
     const width = this.game.cameras.main.width;
     const height = this.game.cameras.main.height;
 
+    // game UI
     this.uiContainer = this.game.add.container(0, 0).setDepth(20);
 
     this.turnText = this.game.add
@@ -171,6 +174,80 @@ export class GameUI {
       .bitmapText(8, height - 8, "pixelfont", "Level 1\n")
       .setMaxWidth(150)
       .setOrigin(0, 1);
+
+    this.levelTitle = this.game.add
+      .bitmapText(
+        width / 2,
+        height / 2 - 120,
+        "pixelfontBold",
+        "Level 1\nSurvive for 5 turns",
+        12,
+      )
+      .setCenterAlign()
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0);
+
+    this.uiContainer.add([this.levelText, this.levelTitle]);
+
+    // Menu
+    this.menuContainer = this.game.add.container(0, 0).setDepth(20);
+    const menuTitleText = this.game.add
+      .bitmapText(
+        width / 2,
+        height / 2 - 120,
+        "pixelfontBold",
+        "Symbio Garden",
+        24,
+      )
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0);
+
+    this.game.tweens.add({
+      targets: menuTitleText,
+      duration: 500,
+      delay: 800,
+      alpha: 1,
+      onComplete: () => {
+        this.game.tweens.add({
+          targets: playButton,
+          duration: 500,
+          alpha: 1,
+        });
+      },
+    });
+
+    const playButton = this.game.add
+      .bitmapText(width - 8 - 64, height - 8 - 64, "pixelfontBold", "Play", 14)
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerover", () => {
+        this.game.tweens.add({
+          targets: playButton,
+          duration: 200,
+          scale: 1.1,
+        });
+      })
+      .on("pointerout", () => {
+        this.game.tweens.add({
+          targets: playButton,
+          duration: 200,
+          scale: 1,
+        });
+      })
+      .on("pointerdown", () => {
+        this.game.sound.play("click");
+        this.menuContainer.setVisible(false);
+        this.show(true);
+        // start game
+        this.game.setLevel(1);
+      })
+      .setAlpha(0);
+
+    this.menuContainer.add([menuTitleText, playButton]);
+  }
+
+  show(isShow: boolean) {
+    this.uiContainer.setVisible(isShow);
   }
 
   showActionButtons(show: boolean) {
@@ -243,7 +320,22 @@ export class GameUI {
 
   setLevel(level: number) {
     this.levelConfig = levels[level - 1];
+    this.levelTitle.setText(`Level ${level}\n${this.levelConfig.description}`);
     this.levelText.setText(`Level ${level}\n${this.levelConfig.description}`);
+
+    this.game.tweens.add({
+      targets: this.levelTitle,
+      duration: 500,
+      alpha: 1,
+      onComplete: () => {
+        this.game.tweens.add({
+          targets: this.levelTitle,
+          delay: 2000,
+          duration: 500,
+          alpha: 0,
+        });
+      },
+    });
   }
 
   update(data: {

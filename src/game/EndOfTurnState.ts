@@ -9,7 +9,7 @@ export class EndOfTurnState implements GameState {
   }
 
   enter() {
-    console.log("Entering End of Turn State");
+    // console.log("Entering End of Turn State");
     // Additional logic for entering the end of turn state
     // This could include displaying a summary of the turn, updating UI elements, etc.
 
@@ -46,7 +46,7 @@ export class EndOfTurnState implements GameState {
             ? `Plant hp -${lackOfWaterDamage} due to lack of water.\n`
             : ""
         }`,
-        { x: 0.5, y: 1 }
+        { x: 0.5, y: 1 },
       );
       this.game.gameUi.showTooltip(true);
     }
@@ -62,23 +62,40 @@ export class EndOfTurnState implements GameState {
         256,
         64,
         `Game Over\nPlant has died.\nYou failed to restore balance.`,
-        { x: 0.5, y: 1 }
+        { x: 0.5, y: 1 },
       );
       this.game.gameUi.showTooltip(true);
       this.game.gameOver();
     } else {
+      // check if level is complete
+      if (this.game.levelConfig.goal === "TURN") {
+        if (this.game.turn >= this.game.levelConfig.value) {
+          this.game.gameUi.setTooltip(
+            this.game.scale.width / 2,
+            this.game.scale.height - 8,
+            256,
+            64,
+            `Level ${this.game.level} Complete\nYou have reached the goal of ${this.game.levelConfig.value} turns.\nYou have survived until now.`,
+            { x: 0.5, y: 1 },
+          );
+          this.game.gameUi.showTooltip(true);
+          this.game.gameOver(true);
+          this.game.sound.play("levelup");
+          return;
+        }
+      }
       this.game.nextTurn();
     }
   }
 
   update(time: number, delta: number): void {
-    console.log("Updating End of Turn State");
+    // console.log("Updating End of Turn State");
     // Additional logic for updating the end of turn state
     // This could include animations, transitions, or displaying final scores
   }
 
   exit() {
-    console.log("Exiting End of Turn State");
+    // console.log("Exiting End of Turn State");
     // Additional logic for exiting the end of turn state
     // This could include resetting variables, stopping animations, etc.
   }

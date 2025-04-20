@@ -8,7 +8,8 @@ import { FinishGameState } from "../game/FinishGameState";
 import { GameUI } from "../game/GameUI";
 import { WateringState } from "../game/WateringState";
 import { ObserveState } from "../game/ObserveState";
-import { levels } from "../level";
+import { LevelConfig, levels } from "../level";
+import { MenuGameState } from "../game/MenuGameState";
 
 export class Game extends Scene {
   level: number;
@@ -25,11 +26,11 @@ export class Game extends Scene {
   // states
   playerTurnState: PlayerTurnState;
   endofTurnState: EndOfTurnState;
-  finishState: FinishGameState;
   gameUi: GameUI;
   wateringState: WateringState;
   observeState: ObserveState;
-  levelConfig: import("/home/anzz/dev/symbio-garden/src/level").LevelConfig;
+  levelConfig: LevelConfig;
+  menuGameState: any;
 
   constructor() {
     super("Game");
@@ -41,11 +42,11 @@ export class Game extends Scene {
     this.gameUi = new GameUI(this);
 
     // states
+    this.menuGameState = new MenuGameState(this);
     this.playerTurnState = new PlayerTurnState(this);
     this.wateringState = new WateringState(this);
     this.observeState = new ObserveState(this);
     this.endofTurnState = new EndOfTurnState(this);
-    this.finishState = new FinishGameState(this);
   }
 
   preload() {
@@ -68,6 +69,7 @@ export class Game extends Scene {
     this.load.audio("heal", "audio/heal.wav");
     this.load.audio("watering", "audio/watering.mp3");
     this.load.audio("hit", "audio/hit.wav");
+    this.load.audio("levelup", "audio/levelup.wav");
   }
 
   createWateringAnimation() {
@@ -142,16 +144,25 @@ export class Game extends Scene {
     this.plant = new Plant(this, width / 2, height / 2, 50);
 
     this.gameUi.create();
-    this.gameUi.setHp(this.plant.hp);
+    this.gameUi.show(false);
     this.createWateringAnimation();
 
-    this.setLevel(1);
+    this.changeState(this.menuGameState);
   }
 
   setLevel(l: number) {
     this.level = l;
     this.levelConfig = this.getLevelConfig(this.level);
     this.gameUi.setLevel(this.level);
+
+    // plant
+    this.plant = new Plant(
+      this,
+      this.scale.width / 2,
+      this.scale.height / 2,
+      50,
+    );
+    this.gameUi.setHp(this.plant.hp);
     // the game starts with player turn
     this.changeState(this.playerTurnState);
   }
@@ -230,8 +241,8 @@ export class Game extends Scene {
     this.changeState(this.playerTurnState);
   }
 
-  gameOver() {
-    this.changeState(this.finishState);
+  gameOver(isLevelCompleted: boolean = false) {
+    this.changeState(new FinishGameState(this, isLevelCompleted));
   }
 
   update(time: number, delta: number): void {

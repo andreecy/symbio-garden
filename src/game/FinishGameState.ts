@@ -2,15 +2,16 @@ import { Game } from "../scenes/Game";
 import { GameState } from "./GameState";
 
 export class FinishGameState implements GameState {
-  game: Game;
-
-  constructor(game: Game) {
-    this.game = game;
-  }
+  constructor(
+    private game: Game,
+    private isLevelCompleted?: boolean,
+  ) {}
 
   enter() {
     console.log("Entering Finish Game State");
     // Additional logic for entering the finish game state
+
+    console.log(this.isLevelCompleted ? "Level Completed" : "Game Over");
   }
 
   update(time: number, delta: number): void {
