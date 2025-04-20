@@ -8,6 +8,7 @@ import { FinishGameState } from "../game/FinishGameState";
 import { GameUI } from "../game/GameUI";
 import { WateringState } from "../game/WateringState";
 import { ObserveState } from "../game/ObserveState";
+import { levels } from "../level";
 
 export class Game extends Scene {
   level: number;
@@ -28,9 +29,11 @@ export class Game extends Scene {
   gameUi: GameUI;
   wateringState: WateringState;
   observeState: ObserveState;
+  levelConfig: import("/home/anzz/dev/symbio-garden/src/level").LevelConfig;
 
   constructor() {
     super("Game");
+    this.level = 1;
     this.turn = 1;
     this.insects = [];
     this.waterCount = 50;
@@ -142,8 +145,19 @@ export class Game extends Scene {
     this.gameUi.setHp(this.plant.hp);
     this.createWateringAnimation();
 
+    this.setLevel(1);
+  }
+
+  setLevel(l: number) {
+    this.level = l;
+    this.levelConfig = this.getLevelConfig(this.level);
+    this.gameUi.setLevel(this.level);
     // the game starts with player turn
     this.changeState(this.playerTurnState);
+  }
+
+  getLevelConfig(l: number) {
+    return levels[l - 1];
   }
 
   changeState(state: GameState) {

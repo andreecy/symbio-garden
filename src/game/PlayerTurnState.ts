@@ -13,6 +13,23 @@ export class PlayerTurnState implements GameState {
     // Additional logic for entering the player turn state
     // This could include setting up the UI, enabling player actions, etc.
 
+    if (this.game.levelConfig.goal === "TURN") {
+      if (this.game.turn > this.game.levelConfig.value) {
+        this.game.gameUi.setTooltip(
+          this.game.scale.width / 2,
+          this.game.scale.height - 8,
+          256,
+          64,
+          `Level ${this.game.level} Complete\nYou have reached the goal of ${this.game.levelConfig.value} turns.\nYou have survived until now.`,
+          { x: 0.5, y: 1 },
+        );
+        this.game.gameUi.showTooltip(true);
+        // this.game.gameOver();
+        this.game.setLevel(this.game.level + 1);
+        return;
+      }
+    }
+
     this.game.gameUi.showActionButtons(true);
   }
 
