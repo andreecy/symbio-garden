@@ -13,6 +13,7 @@ export class GameUI {
   observeButton: Phaser.GameObjects.Image;
   tooltip: Phaser.GameObjects.Rectangle;
   tooltipText: Phaser.GameObjects.BitmapText;
+  levelText: Phaser.GameObjects.BitmapText;
 
   constructor(private game: Game) {
     this.hp = 0;
@@ -124,7 +125,7 @@ export class GameUI {
         const y = this.observeButton.getBounds().top + 12;
         const w = 120;
         const h = 48;
-        const text = "Observe";
+        const text = "Observe\nWait and see for the next turn";
         this.setTooltip(x, y, w, h, text);
         this.showTooltip(true);
       })
@@ -157,12 +158,17 @@ export class GameUI {
         this.tooltip.getBounds().left + 8,
         this.tooltip.getBounds().top + 8,
         "pixelfont",
-        "-",
+        "-"
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setOrigin(0, 0)
       .setDepth(50)
       .setVisible(false);
+
+    this.levelText = this.game.add
+      .bitmapText(8, height - 8, "pixelfont", "Level 1\nSurvive until Turn 10")
+      .setMaxWidth(150)
+      .setOrigin(0, 1);
   }
 
   showActionButtons(show: boolean) {
@@ -175,7 +181,7 @@ export class GameUI {
     w: number,
     h: number,
     text: string,
-    origin?: { x: number; y: number },
+    origin?: { x: number; y: number }
   ) {
     if (origin) {
       this.tooltip.setOrigin(origin.x, origin.y);
@@ -186,7 +192,7 @@ export class GameUI {
     this.tooltipText
       .setPosition(
         this.tooltip.getBounds().left + 8,
-        this.tooltip.getBounds().top + 8,
+        this.tooltip.getBounds().top + 8
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setText(text);
@@ -215,7 +221,7 @@ export class GameUI {
             onComplete: () => {
               this.hpBar.setAlpha(1);
               this.hpBar.setFillStyle(
-                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
+                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42
               );
               this.hpText.setText(`${hp}/100`);
             },
@@ -225,7 +231,7 @@ export class GameUI {
     } else {
       this.hpBar.setSize(100 * (hp / 100), 10);
       this.hpBar.setFillStyle(
-        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
+        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42
       );
       this.hpText.setText(`${hp}/100`);
     }

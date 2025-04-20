@@ -46,7 +46,7 @@ export class EndOfTurnState implements GameState {
             ? `Plant hp -${lackOfWaterDamage} due to lack of water.\n`
             : ""
         }`,
-        { x: 0.5, y: 1 },
+        { x: 0.5, y: 1 }
       );
       this.game.gameUi.showTooltip(true);
     }
@@ -55,7 +55,20 @@ export class EndOfTurnState implements GameState {
       this.game.sound.play("hit");
     }
 
-    this.game.nextTurn();
+    if (this.game.plant.hp <= 0) {
+      this.game.gameUi.setTooltip(
+        this.game.scale.width / 2,
+        this.game.scale.height - 8,
+        256,
+        64,
+        `Game Over\nPlant has died.\nYou failed to restore balance.`,
+        { x: 0.5, y: 1 }
+      );
+      this.game.gameUi.showTooltip(true);
+      this.game.gameOver();
+    } else {
+      this.game.nextTurn();
+    }
   }
 
   update(time: number, delta: number): void {

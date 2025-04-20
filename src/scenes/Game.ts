@@ -10,6 +10,7 @@ import { WateringState } from "../game/WateringState";
 import { ObserveState } from "../game/ObserveState";
 
 export class Game extends Scene {
+  level: number;
   state: GameState;
   turn: number;
   plant: Plant;
@@ -213,6 +214,10 @@ export class Game extends Scene {
   nextTurn() {
     this.turn++;
     this.changeState(this.playerTurnState);
+  }
+
+  gameOver() {
+    this.changeState(this.finishState);
   }
 
   update(time: number, delta: number): void {
