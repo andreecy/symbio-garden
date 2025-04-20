@@ -25,7 +25,7 @@ export class GameUI {
     this.uiContainer = this.game.add.container(0, 0).setDepth(20);
 
     this.turnText = this.game.add
-      .bitmapText(width / 2, 8, "depixel", `Turn ${this.game.turn}`, 8)
+      .bitmapText(width / 2, 8, "pixelfontBold", `Turn ${this.game.turn}`)
       .setOrigin(0.5, 0);
     this.uiContainer.add(this.turnText);
 
@@ -42,7 +42,7 @@ export class GameUI {
     this.uiContainer.add(this.hpBar);
 
     this.hpText = this.game.add
-      .bitmapText(8 + 100 / 2, 8 + 10 / 2, "depixel", "100/100", 8)
+      .bitmapText(8 + 100 / 2, 8 + 10 / 2, "pixelfont", "100/100")
       .setOrigin(0.5, 0.5);
     this.uiContainer.add(this.hpText);
 
@@ -52,13 +52,13 @@ export class GameUI {
       .setScale(0.5);
 
     this.waterText = this.game.add
-      .bitmapText(waterIcon.x, 12, "depixel", "50", 8)
+      .bitmapText(waterIcon.x, 12, "pixelfontBold", "50")
       .setOrigin(0, 0);
 
     const bugIcon = this.game.add.image(width - 64, 32, "bug").setOrigin(1, 0);
 
     this.insectText = this.game.add
-      .bitmapText(bugIcon.x + 2, 36, "depixel", "0", 8)
+      .bitmapText(bugIcon.x + 2, 36, "pixelfontBold", "0")
       .setOrigin(0, 0);
 
     this.uiContainer.add([waterIcon, this.waterText, bugIcon, this.insectText]);
@@ -108,7 +108,7 @@ export class GameUI {
     // do nothing button
     this.observeButton = this.game.add
       .image(width - 56, height - 48, "observe")
-      // .bitmapText(width - 16 - 52, height - 16 - 16, "depixel", "Observe", 8)
+      // .bitmapText(width - 16 - 52, height - 16 - 16, "pixelfont", "Observe", 8)
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
       .on("pointerover", () => {
@@ -138,7 +138,7 @@ export class GameUI {
       })
       .on("pointerdown", () => {
         // do nothing
-        this.game.endTurn();
+        this.game.observe();
       });
 
     this.actionButtons.add(this.observeButton);
@@ -155,9 +155,8 @@ export class GameUI {
       .bitmapText(
         this.tooltip.getBounds().left + 8,
         this.tooltip.getBounds().top + 8,
-        "depixel",
+        "pixelfont",
         "-",
-        8,
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setOrigin(0, 0)
@@ -169,7 +168,19 @@ export class GameUI {
     this.actionButtons.setVisible(show);
   }
 
-  setTooltip(x: number, y: number, w: number, h: number, text: string) {
+  setTooltip(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    text: string,
+    origin?: { x: number; y: number },
+  ) {
+    if (origin) {
+      this.tooltip.setOrigin(origin.x, origin.y);
+    } else {
+      this.tooltip.setOrigin(1, 0.5);
+    }
     this.tooltip.setPosition(x, y).setSize(w, h);
     this.tooltipText
       .setPosition(
@@ -202,6 +213,9 @@ export class GameUI {
             alpha: 0,
             onComplete: () => {
               this.hpBar.setAlpha(1);
+              this.hpBar.setFillStyle(
+                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
+              );
               this.hpText.setText(`${hp}/100`);
             },
           });
@@ -209,6 +223,9 @@ export class GameUI {
       });
     } else {
       this.hpBar.setSize(100 * (hp / 100), 10);
+      this.hpBar.setFillStyle(
+        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
+      );
       this.hpText.setText(`${hp}/100`);
     }
 

@@ -7,6 +7,7 @@ import { EndOfTurnState } from "../game/EndOfTurnState";
 import { FinishGameState } from "../game/FinishGameState";
 import { GameUI } from "../game/GameUI";
 import { WateringState } from "../game/WateringState";
+import { ObserveState } from "../game/ObserveState";
 
 export class Game extends Scene {
   state: GameState;
@@ -25,6 +26,7 @@ export class Game extends Scene {
   finishState: FinishGameState;
   gameUi: GameUI;
   wateringState: WateringState;
+  observeState: ObserveState;
 
   constructor() {
     super("Game");
@@ -37,6 +39,7 @@ export class Game extends Scene {
     // states
     this.playerTurnState = new PlayerTurnState(this);
     this.wateringState = new WateringState(this);
+    this.observeState = new ObserveState(this);
     this.endofTurnState = new EndOfTurnState(this);
     this.finishState = new FinishGameState(this);
   }
@@ -54,7 +57,8 @@ export class Game extends Scene {
     this.load.image("watering", "watering.png");
     this.load.image("bug", "bug-sm.png");
     this.load.image("observe", "observe.png");
-    this.load.bitmapFont("depixel", "depixel-white.png", "depixel-white.xml");
+    this.load.bitmapFont("pixelfont", "minogram_6x10.png", "minogram_6x10.xml");
+    this.load.bitmapFont("pixelfontBold", "thick_8x8.png", "thick_8x8.xml");
   }
 
   createWateringAnimation() {
@@ -167,6 +171,17 @@ export class Game extends Scene {
         },
       });
     }
+  }
+
+  observe() {
+    this.changeState(this.observeState);
+
+    this.time.addEvent({
+      delay: 2000,
+      callback: () => {
+        this.endTurn();
+      },
+    });
   }
 
   addInsect() {
