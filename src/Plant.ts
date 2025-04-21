@@ -11,6 +11,7 @@ export class Plant extends Phaser.GameObjects.Image {
     const renderer = this.scene.game
       .renderer as Phaser.Renderer.WebGL.WebGLRenderer;
     renderer.pipelines.add("sway", new SwayPipeline(this.scene.game));
+    renderer.pipelines.get("sway").set1f("strength", 1.0);
     this.setPipeline("sway");
   }
 
@@ -25,6 +26,16 @@ export class Plant extends Phaser.GameObjects.Image {
   decreaseHp(amount: number) {
     this._hp = Math.max(0, this._hp - amount);
   }
+
+  setSwayStrength(strength: number) {
+    const renderer = this.scene.game
+      .renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+    const pipeline = renderer.pipelines.get("sway") as SwayPipeline;
+    console.log("set sway strength", strength);
+    if (pipeline) {
+      pipeline.set1f("strength", strength);
+    }
+  }
 }
 
 class SwayPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
@@ -38,6 +49,7 @@ class SwayPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
 
   onPreRender() {
     this.set1f("time", this.game.loop.time / 1000);
+    // this.set1f("strength", 1.0);
   }
 
   static fragmentShader = `
@@ -47,19 +59,21 @@ class SwayPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
 
     uniform float time;
     uniform sampler2D uMainSampler;
+    uniform float strength;
     varying vec2 outTexCoord;
 
     void main() {
         vec2 uv = outTexCoord;
         
-        // Intensity grows from bottom (0.0) to top (1.0)
-        float swayStrength = 1.0 - uv.y;
+        // Horizontal sway: stronger near top
+        float topSwayStrength = (1.0 - uv.y) * strength;
+        float waveX = sin((uv.y + time * 0.8) * 5.0) * 0.01;
+        uv.x += waveX * topSwayStrength;
 
-        // Sway movement
-        float wave = sin((pow(uv.y, 0.2) + time * 0.5) * 10.0) * 0.01;
-
-        // Only apply sway more at top
-        uv.x += wave * swayStrength;
+        // Vertical sway: stronger near sides
+        float sideSwayStrength = abs(uv.x - 0.5) * strength;
+        float waveY = sin((uv.x + time * 0.5) * 10.0) * 0.01;
+        uv.y += waveY * sideSwayStrength;
 
         gl_FragColor = texture2D(uMainSampler, uv);
     }

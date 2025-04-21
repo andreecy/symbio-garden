@@ -166,7 +166,7 @@ export class Game extends Scene {
       this,
       this.scale.width / 2,
       this.scale.height / 2,
-      50,
+      50
     );
     this.gameUi.setHp(this.plant.hp);
     // the game starts with player turn
@@ -198,6 +198,13 @@ export class Game extends Scene {
       this.wateringTween.restart();
       this.sound.play("watering");
 
+      this.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          this.plant.setSwayStrength(3.0);
+        },
+      });
+
       this.changeState(this.wateringState);
 
       this.time.addEvent({
@@ -210,6 +217,7 @@ export class Game extends Scene {
           this.time.addEvent({
             delay: 1000,
             callback: () => {
+              this.plant.setSwayStrength(1.0);
               this.endTurn();
             },
           });
