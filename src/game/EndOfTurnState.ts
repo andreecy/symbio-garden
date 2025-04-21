@@ -65,7 +65,7 @@ export class EndOfTurnState implements GameState {
         { x: 0.5, y: 1 },
       );
       this.game.gameUi.showTooltip(true);
-      this.game.gameOver();
+      this.game.finishGame();
     } else {
       // check if level is complete
       if (this.game.levelConfig.goal === "TURN") {
@@ -79,7 +79,7 @@ export class EndOfTurnState implements GameState {
             { x: 0.5, y: 1 },
           );
           this.game.gameUi.showTooltip(true);
-          this.game.gameOver(true);
+          this.game.finishGame(true);
           this.game.sound.play("levelup");
           return;
         }

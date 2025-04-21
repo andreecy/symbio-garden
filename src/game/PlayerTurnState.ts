@@ -13,6 +13,8 @@ export class PlayerTurnState implements GameState {
     // Additional logic for entering the player turn state
     // This could include setting up the UI, enabling player actions, etc.
 
+    this.game.gameUi.showMenuUi(false);
+    this.game.gameUi.showGameUi(true);
     this.game.gameUi.showActionButtons(true);
   }
 

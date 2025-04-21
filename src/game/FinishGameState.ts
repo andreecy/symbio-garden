@@ -10,6 +10,7 @@ export class FinishGameState implements GameState {
   enter() {
     console.log("Entering Finish Game State");
     // Additional logic for entering the finish game state
+    this.game.gameUi.showMenuUi(false);
 
     console.log(this.isLevelCompleted ? "Level Completed" : "Game Over");
   }

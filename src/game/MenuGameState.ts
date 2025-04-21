@@ -7,6 +7,8 @@ export class MenuGameState implements GameState {
   enter() {
     console.log("Entering Menu Game State");
     // Additional logic for entering the menu game state
+    this.game.gameUi.showMenuUi(true);
+    this.game.gameUi.showGameUi(false);
   }
 
   update(time: number, delta: number): void {
@@ -19,5 +21,6 @@ export class MenuGameState implements GameState {
     console.log("Exiting Menu Game State");
     // Additional logic for exiting the menu game state
     // This could include resetting variables, disabling player actions, etc.
+    this.game.gameUi.showMenuUi(false);
   }
 }

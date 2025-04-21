@@ -144,10 +144,16 @@ export class Game extends Scene {
     this.plant = new Plant(this, width / 2, height / 2, 50);
 
     this.gameUi.create();
-    this.gameUi.show(false);
+    this.gameUi.showGameUi(false);
     this.createWateringAnimation();
 
     this.changeState(this.menuGameState);
+    // this.startPlay();
+    // this.finishGame();
+  }
+
+  startPlay() {
+    this.setLevel(1);
   }
 
   setLevel(l: number) {
@@ -241,7 +247,7 @@ export class Game extends Scene {
     this.changeState(this.playerTurnState);
   }
 
-  gameOver(isLevelCompleted: boolean = false) {
+  finishGame(isLevelCompleted: boolean = false) {
     this.changeState(new FinishGameState(this, isLevelCompleted));
   }
 

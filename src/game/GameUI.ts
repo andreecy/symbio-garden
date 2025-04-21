@@ -53,7 +53,7 @@ export class GameUI {
     this.uiContainer.add(this.hpText);
 
     const waterIcon = this.game.add
-      .image(width - 64, 8, "water")
+      .image(width - 32, 8, "water")
       .setOrigin(1, 0)
       .setScale(0.5);
 
@@ -61,10 +61,10 @@ export class GameUI {
       .bitmapText(waterIcon.x, 12, "pixelfontBold", "50")
       .setOrigin(0, 0);
 
-    const bugIcon = this.game.add.image(width - 64, 32, "bug").setOrigin(1, 0);
+    const bugIcon = this.game.add.image(width - 70, 7, "bug").setOrigin(1, 0);
 
     this.insectText = this.game.add
-      .bitmapText(bugIcon.x + 2, 36, "pixelfontBold", "0")
+      .bitmapText(bugIcon.x + 2, bugIcon.y + 5, "pixelfontBold", "0")
       .setOrigin(0, 0);
 
     this.uiContainer.add([waterIcon, this.waterText, bugIcon, this.insectText]);
@@ -236,17 +236,18 @@ export class GameUI {
       })
       .on("pointerdown", () => {
         this.game.sound.play("click");
-        this.menuContainer.setVisible(false);
-        this.show(true);
-        // start game
-        this.game.setLevel(1);
+        this.game.startPlay();
       })
       .setAlpha(0);
 
     this.menuContainer.add([menuTitleText, playButton]);
   }
 
-  show(isShow: boolean) {
+  showMenuUi(isShow: boolean) {
+    this.menuContainer.setVisible(isShow);
+  }
+
+  showGameUi(isShow: boolean) {
     this.uiContainer.setVisible(isShow);
   }
 
