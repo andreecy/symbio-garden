@@ -21,7 +21,29 @@ export class Plant extends Phaser.GameObjects.Image {
       .renderer as Phaser.Renderer.WebGL.WebGLRenderer;
     renderer.pipelines.add("sway", new SwayPipeline(this.scene.game));
     renderer.pipelines.get("sway").set1f("strength", 1.0);
+    renderer.pipelines
+      .get("sway")
+      .set4f(
+        "frameUV",
+        this.frameUV.x,
+        this.frameUV.y,
+        this.frameUV.w,
+        this.frameUV.h
+      );
     this.setPipeline("sway");
+  }
+
+  get frameUV() {
+    const frame = this.frame;
+    const baseTexWidth = frame.texture.source[0].width;
+    const baseTexHeight = frame.texture.source[0].height;
+
+    return {
+      x: frame.cutX / baseTexWidth,
+      y: frame.cutY / baseTexHeight,
+      w: frame.cutWidth / baseTexWidth,
+      h: frame.cutHeight / baseTexHeight,
+    };
   }
 
   get hp() {
@@ -64,6 +86,27 @@ export class Plant extends Phaser.GameObjects.Image {
     }
   }
 
+  setFrame(
+    frame: string | number | Phaser.Textures.Frame,
+    updateSize?: boolean,
+    updateOrigin?: boolean
+  ): this {
+    super.setFrame(frame, updateSize, updateOrigin);
+    const renderer = this.scene.game
+      .renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+    const pipeline = renderer.pipelines.get("sway") as SwayPipeline;
+    if (pipeline) {
+      pipeline.set4f(
+        "frameUV",
+        this.frameUV.x,
+        this.frameUV.y,
+        this.frameUV.w,
+        this.frameUV.h
+      );
+    }
+    return this;
+  }
+
   setSwayStrength(strength: number) {
     const renderer = this.scene.game
       .renderer as Phaser.Renderer.WebGL.WebGLRenderer;
@@ -97,20 +140,28 @@ class SwayPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
     uniform float time;
     uniform sampler2D uMainSampler;
     uniform float strength;
+    uniform vec4 frameUV;
     varying vec2 outTexCoord;
 
     void main() {
+        // Normalize UV within current frame
         vec2 uv = outTexCoord;
+        vec2 framePos = frameUV.xy;
+        vec2 frameSize = frameUV.zw;
+        vec2 localUV = (uv - framePos) / frameSize;
         
         // Horizontal sway: stronger near top
-        float topSwayStrength = (1.0 - uv.y) * strength;
-        float waveX = sin((uv.y + time * 0.8) * 5.0) * 0.003;
-        uv.x += waveX * topSwayStrength;
+        float topSwayStrength = (1.0 - localUV.y) * strength;
+        float waveX = sin((uv.y + time * 0.5) * 5.0) * 0.01;
+        localUV.x += waveX * topSwayStrength;
 
         // Vertical sway: stronger near sides
-        float sideSwayStrength = abs(uv.x - 0.5) * strength;
-        float waveY = sin((uv.x + time * 0.5) * 10.0) * 0.003;
-        uv.y += waveY * sideSwayStrength;
+        float sideSwayStrength = abs(localUV.x - 0.5) * strength;
+        float waveY = sin((uv.x + time * 0.5) * 10.0) * 0.01;
+        localUV.y += waveY * sideSwayStrength;
+
+        // Convert back to full texture UV
+        uv = framePos + localUV * frameSize;
 
         gl_FragColor = texture2D(uMainSampler, uv);
     }

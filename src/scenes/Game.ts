@@ -54,7 +54,7 @@ export class Game extends Scene {
 
     this.load.image("land", "land.png");
     this.load.spritesheet("plant", "plant.png", {
-      frameWidth: 192,
+      frameWidth: 200,
       frameHeight: 144,
     });
     this.load.spritesheet("insect", "bug.png", {
