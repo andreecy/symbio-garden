@@ -53,7 +53,10 @@ export class Game extends Scene {
     this.load.setPath("assets");
 
     this.load.image("land", "land.png");
-    this.load.image("plant", "plant.png");
+    this.load.spritesheet("plant", "plant.png", {
+      frameWidth: 192,
+      frameHeight: 144,
+    });
     this.load.spritesheet("insect", "bug.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -162,12 +165,7 @@ export class Game extends Scene {
     this.gameUi.setLevel(this.level);
 
     // plant
-    this.plant = new Plant(
-      this,
-      this.scale.width / 2,
-      this.scale.height / 2,
-      50
-    );
+    this.plant.setHp(50);
     this.gameUi.setHp(this.plant.hp);
     // the game starts with player turn
     this.changeState(this.playerTurnState);
