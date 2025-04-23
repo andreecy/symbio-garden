@@ -13,6 +13,11 @@ export class EndOfTurnState implements GameState {
     // Additional logic for entering the end of turn state
     // This could include displaying a summary of the turn, updating UI elements, etc.
 
+    // bio control count increases by 1 if turn is equal to 2
+    if (this.game.turn % 2 === 0) {
+      this.game.addBioControl();
+    }
+
     let isInsectArrived = false;
     // insects count increases by 1 if turn is equal insect rate
     if (this.game.turn % this.game.levelConfig.insectRate === 0) {
@@ -36,10 +41,10 @@ export class EndOfTurnState implements GameState {
     if (isInsectArrived || insectDamage > 0 || lackOfWaterDamage > 0) {
       this.game.dialogUi.push(
         `${isInsectArrived ? "An insect has arrived.\n" : ""}${
-          insectDamage > 0 ? `Plant hp -${insectDamage} due to insects.\n` : ""
+          insectDamage > 0 ? `Plant HP -${insectDamage} due to insects.\n` : ""
         }${
           lackOfWaterDamage > 0
-            ? `Plant hp -${lackOfWaterDamage} due to lack of water.\n`
+            ? `Plant HP -${lackOfWaterDamage} due to lack of water.\n`
             : ""
         }`
       );

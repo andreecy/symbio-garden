@@ -20,6 +20,8 @@ export class GameUI {
   levelTitle: Phaser.GameObjects.BitmapText;
   nextLevelButton: Phaser.GameObjects.BitmapText;
   restartLevelButton: Phaser.GameObjects.BitmapText;
+  sprayText: Phaser.GameObjects.BitmapText;
+  sprayButton: Phaser.GameObjects.Image;
 
   constructor(private game: Game) {
     this.hp = 0;
@@ -63,15 +65,68 @@ export class GameUI {
       .bitmapText(waterIcon.x, 12, "pixelfontBold", "50")
       .setOrigin(0, 0);
 
-    const bugIcon = this.game.add.image(width - 70, 7, "bug").setOrigin(1, 0);
+    const bugIcon = this.game.add.image(width - 110, 7, "bug").setOrigin(1, 0);
 
     this.insectText = this.game.add
       .bitmapText(bugIcon.x + 2, bugIcon.y + 5, "pixelfontBold", "0")
       .setOrigin(0, 0);
 
-    this.uiContainer.add([waterIcon, this.waterText, bugIcon, this.insectText]);
+    const sprayIcon = this.game.add
+      .image(width - 70, 8, "spray-icon")
+      .setOrigin(1, 0);
+
+    this.sprayText = this.game.add
+      .bitmapText(sprayIcon.x + 2, 12, "pixelfontBold", "0")
+      .setOrigin(0, 0);
+
+    this.uiContainer.add([
+      waterIcon,
+      this.waterText,
+      bugIcon,
+      this.insectText,
+      sprayIcon,
+      this.sprayText,
+    ]);
 
     this.actionButtons = this.game.add.container(0, 0).setDepth(10);
+
+    // spray button
+    this.sprayButton = this.game.add
+      .image(width - 56, height - 200, "spray")
+      .setOrigin(0.5, 0.5)
+      .setTint(0xeeeeee)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerover", () => {
+        this.sprayButton.setTint(0xffffff);
+        // giveWaterText.setVisible(true);
+        this.game.tweens.add({
+          targets: this.sprayButton,
+          scale: 1.1,
+          duration: 100,
+        });
+
+        const x = this.sprayButton.getBounds().left - 4;
+        const y = this.sprayButton.getBounds().top + 12;
+        const w = 120;
+        const h = 48;
+        const text = "Bio Control Spray\nReduce -3 Insects\nCost: -5 Spray";
+        this.setTooltip(x, y, w, h, text);
+        this.showTooltip(true);
+      })
+      .on("pointerout", () => {
+        this.sprayButton.setTint(0xeeeeee);
+        this.game.tweens.add({
+          targets: this.sprayButton,
+          scale: 1,
+          duration: 100,
+        });
+
+        this.showTooltip(false);
+      })
+      .on("pointerdown", () => {
+        this.game.sound.play("click");
+        this.game.giveBioControl();
+      });
 
     // water button
     this.waterButton = this.game.add
@@ -92,7 +147,7 @@ export class GameUI {
         const y = this.waterButton.getBounds().top + 12;
         const w = 110;
         const h = 48;
-        const text = "Give water\nHeal: +20 HP\nCost: -10 water";
+        const text = "Give Water\nHeal: +20 HP\nCost: -10 Water";
         this.setTooltip(x, y, w, h, text);
         this.showTooltip(true);
       })
@@ -111,8 +166,6 @@ export class GameUI {
         this.game.sound.play("click");
         this.game.giveWater();
       });
-
-    this.actionButtons.add(this.waterButton);
 
     // observe button
     this.observeButton = this.game.add
@@ -150,7 +203,11 @@ export class GameUI {
         this.game.observe();
       });
 
-    this.actionButtons.add(this.observeButton);
+    this.actionButtons.add([
+      this.sprayButton,
+      this.waterButton,
+      this.observeButton,
+    ]);
     // hide action buttons
     this.actionButtons.setVisible(false);
 
@@ -418,11 +475,13 @@ export class GameUI {
     turn: number;
     plant: { hp: number };
     insects: any[];
+    bioControlCount: number;
     waterCount: number;
   }) {
-    const { turn, insects, waterCount } = data;
+    const { turn, insects, waterCount, bioControlCount } = data;
     this.turnText.text = `Turn ${turn}`;
-    this.waterText.text = `${waterCount}`;
+    this.sprayText.text = `${bioControlCount}`;
     this.insectText.text = `${insects.length}`;
+    this.waterText.text = `${waterCount}`;
   }
 }

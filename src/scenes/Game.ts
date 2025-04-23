@@ -33,13 +33,15 @@ export class Game extends Scene {
   levelConfig: LevelConfig;
   menuGameState: any;
   dialogUi: DialogUI;
+  bioControlCount: number;
 
   constructor() {
     super("Game");
     this.level = 1;
     this.turn = 1;
     this.insects = [];
-    this.waterCount = 50;
+    this.bioControlCount = 0;
+    this.waterCount = 0;
 
     this.gameUi = new GameUI(this);
     this.dialogUi = new DialogUI(this);
@@ -68,6 +70,8 @@ export class Game extends Scene {
     this.load.image("watering", "watering.png");
     this.load.image("bug", "bug-sm.png");
     this.load.image("observe", "observe.png");
+    this.load.image("spray-icon", "spray-icon.png");
+    this.load.image("spray", "spray.png");
     this.load.bitmapFont("pixelfont", "minogram_6x10.png", "minogram_6x10.xml");
     this.load.bitmapFont("pixelfontBold", "thick_8x8.png", "thick_8x8.xml");
 
@@ -257,6 +261,29 @@ export class Game extends Scene {
     }
   }
 
+  giveBioControl() {
+    if (this.bioControlCount <= 0) {
+      return;
+    }
+    if (this.bioControlCount >= 5) {
+      this.bioControlCount -= 5;
+      // reduce insect count by 3
+      for (let i = 0; i < 3; i++) {
+        if (this.insects.length > 0) {
+          const insect = this.insects.pop();
+          insect?.destroy();
+        }
+      }
+
+      this.time.addEvent({
+        delay: 2000,
+        callback: () => {
+          this.endTurn();
+        },
+      });
+    }
+  }
+
   observe() {
     this.changeState(this.observeState);
 
@@ -275,6 +302,10 @@ export class Game extends Scene {
     const insect = new Insect(this, x, y);
     insect.setTarget(this.plant);
     this.insects.push(insect);
+  }
+
+  addBioControl() {
+    this.bioControlCount += 1;
   }
 
   endTurn() {
@@ -296,6 +327,7 @@ export class Game extends Scene {
       plant: this.plant,
       insects: this.insects,
       waterCount: this.waterCount,
+      bioControlCount: this.bioControlCount,
     });
 
     this.insects.forEach((insect) => insect.update(time, delta));
