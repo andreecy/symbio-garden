@@ -10,6 +10,7 @@ import { WateringState } from "../game/WateringState";
 import { ObserveState } from "../game/ObserveState";
 import { LevelConfig, levels } from "../level";
 import { MenuGameState } from "../game/MenuGameState";
+import { DialogUI } from "../game/DialogUI";
 
 export class Game extends Scene {
   level: number;
@@ -31,6 +32,7 @@ export class Game extends Scene {
   observeState: ObserveState;
   levelConfig: LevelConfig;
   menuGameState: any;
+  dialogUi: DialogUI;
 
   constructor() {
     super("Game");
@@ -40,6 +42,7 @@ export class Game extends Scene {
     this.waterCount = 50;
 
     this.gameUi = new GameUI(this);
+    this.dialogUi = new DialogUI(this);
 
     // states
     this.menuGameState = new MenuGameState(this);
@@ -149,6 +152,8 @@ export class Game extends Scene {
     this.gameUi.create();
     this.gameUi.showGameUi(false);
     this.createWateringAnimation();
+
+    this.dialogUi.create();
 
     this.changeState(this.menuGameState);
     // this.startPlay();

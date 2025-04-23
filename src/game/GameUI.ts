@@ -88,7 +88,7 @@ export class GameUI {
 
         const x = this.waterButton.getBounds().left - 4;
         const y = this.waterButton.getBounds().top + 12;
-        const w = 120;
+        const w = 110;
         const h = 48;
         const text = "Give water\nHeal: +20 HP\nCost: -10 water";
         this.setTooltip(x, y, w, h, text);
@@ -128,7 +128,7 @@ export class GameUI {
 
         const x = this.observeButton.getBounds().left - 4;
         const y = this.observeButton.getBounds().top + 12;
-        const w = 120;
+        const w = 110;
         const h = 48;
         const text = "Observe\nWait and see for the next turn";
         this.setTooltip(x, y, w, h, text);
@@ -163,7 +163,7 @@ export class GameUI {
         this.tooltip.getBounds().left + 8,
         this.tooltip.getBounds().top + 8,
         "pixelfont",
-        "-",
+        "-"
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setOrigin(0, 0)
@@ -181,7 +181,7 @@ export class GameUI {
         height / 2 - 120,
         "pixelfontBold",
         "Level 1\nSurvive for 5 turns",
-        12,
+        12
       )
       .setCenterAlign()
       .setOrigin(0.5, 0.5)
@@ -197,7 +197,7 @@ export class GameUI {
         height / 2 - 120,
         "pixelfontBold",
         "Symbio Garden",
-        24,
+        24
       )
       .setOrigin(0.5, 0.5)
       .setAlpha(0);
@@ -261,7 +261,7 @@ export class GameUI {
     w: number,
     h: number,
     text: string,
-    origin?: { x: number; y: number },
+    origin?: { x: number; y: number }
   ) {
     if (origin) {
       this.tooltip.setOrigin(origin.x, origin.y);
@@ -272,7 +272,7 @@ export class GameUI {
     this.tooltipText
       .setPosition(
         this.tooltip.getBounds().left + 8,
-        this.tooltip.getBounds().top + 8,
+        this.tooltip.getBounds().top + 8
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setText(text);
@@ -301,7 +301,7 @@ export class GameUI {
             onComplete: () => {
               this.hpBar.setAlpha(1);
               this.hpBar.setFillStyle(
-                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
+                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42
               );
               this.hpText.setText(`${hp}/100`);
             },
@@ -311,7 +311,7 @@ export class GameUI {
     } else {
       this.hpBar.setSize(100 * (hp / 100), 10);
       this.hpBar.setFillStyle(
-        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
+        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42
       );
       this.hpText.setText(`${hp}/100`);
     }

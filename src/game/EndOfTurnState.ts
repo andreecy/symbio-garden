@@ -34,21 +34,16 @@ export class EndOfTurnState implements GameState {
     }
 
     if (isInsectArrived || insectDamage > 0 || lackOfWaterDamage > 0) {
-      this.game.gameUi.setTooltip(
-        this.game.scale.width / 2,
-        this.game.scale.height - 8,
-        256,
-        64,
+      this.game.dialogUi.push(
         `${isInsectArrived ? "An insect has arrived.\n" : ""}${
           insectDamage > 0 ? `Plant hp -${insectDamage} due to insects.\n` : ""
         }${
           lackOfWaterDamage > 0
             ? `Plant hp -${lackOfWaterDamage} due to lack of water.\n`
             : ""
-        }`,
-        { x: 0.5, y: 1 },
+        }`
       );
-      this.game.gameUi.showTooltip(true);
+      this.game.dialogUi.show();
     }
 
     if (insectDamage > 0 || lackOfWaterDamage > 0) {
@@ -56,29 +51,19 @@ export class EndOfTurnState implements GameState {
     }
 
     if (this.game.plant.hp <= 0) {
-      this.game.gameUi.setTooltip(
-        this.game.scale.width / 2,
-        this.game.scale.height - 8,
-        256,
-        64,
-        `Game Over\nPlant has died.\nYou failed to restore balance.`,
-        { x: 0.5, y: 1 },
+      this.game.dialogUi.push(
+        `Game Over\nPlant has died.\nYou failed to restore balance.`
       );
-      this.game.gameUi.showTooltip(true);
+      this.game.dialogUi.show();
       this.game.finishGame();
     } else {
       // check if level is complete
       if (this.game.levelConfig.goal === "TURN") {
         if (this.game.turn >= this.game.levelConfig.value) {
-          this.game.gameUi.setTooltip(
-            this.game.scale.width / 2,
-            this.game.scale.height - 8,
-            256,
-            64,
-            `Level ${this.game.level} Complete\nYou have reached the goal of ${this.game.levelConfig.value} turns.\nYou have survived until now.`,
-            { x: 0.5, y: 1 },
+          this.game.dialogUi.push(
+            `Level ${this.game.level} Complete\nYou have reached the goal of ${this.game.levelConfig.value} turns.\nYou have survived until now.`
           );
-          this.game.gameUi.showTooltip(true);
+          this.game.dialogUi.show();
           this.game.finishGame(true);
           this.game.sound.play("levelup");
           return;
