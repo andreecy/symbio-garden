@@ -147,7 +147,7 @@ export class Game extends Scene {
     this.add.image(width / 2, height / 2, "land");
 
     // plant
-    this.plant = new Plant(this, width / 2, height / 2, 50);
+    this.plant = new Plant(this, width / 2, height / 2, 100);
 
     this.gameUi.create();
     this.gameUi.showGameUi(false);
@@ -161,17 +161,45 @@ export class Game extends Scene {
   }
 
   startPlay() {
-    this.setLevel(1);
+    this.setLevel(2);
+  }
+
+  nextLevel() {
+    if (this.level + 1 > levels.length) {
+      this.finishGame(true);
+      return;
+    }
+
+    this.setLevel(this.level + 1);
+  }
+
+  restartLevel() {
+    this.setLevel(this.level);
   }
 
   setLevel(l: number) {
+    // reset game state
+    this.turn = 1;
+    for (const insect of this.insects) {
+      insect.destroy();
+    }
+    this.insects = [];
+
+    // set level
     this.level = l;
     this.levelConfig = this.getLevelConfig(this.level);
     this.gameUi.setLevel(this.level);
 
     // plant
-    this.plant.setHp(50);
-    this.gameUi.setHp(this.plant.hp);
+    this.plant.setHp(this.levelConfig.hp);
+    this.gameUi.setHp(this.levelConfig.hp);
+    // water
+    this.waterCount = this.levelConfig.water;
+    // insect
+    for (let i = 0; i < this.levelConfig.insect; i++) {
+      this.addInsect();
+    }
+
     // the game starts with player turn
     this.changeState(this.playerTurnState);
   }

@@ -2,10 +2,7 @@ import { Game } from "../scenes/Game";
 import { GameState } from "./GameState";
 
 export class FinishGameState implements GameState {
-  constructor(
-    private game: Game,
-    private isLevelCompleted?: boolean,
-  ) {}
+  constructor(private game: Game, private isLevelCompleted: boolean) {}
 
   enter() {
     console.log("Entering Finish Game State");
@@ -13,6 +10,8 @@ export class FinishGameState implements GameState {
     this.game.gameUi.showMenuUi(false);
 
     console.log(this.isLevelCompleted ? "Level Completed" : "Game Over");
+    this.game.gameUi.showNextLevelButton(this.isLevelCompleted);
+    this.game.gameUi.showRestartLevelButton(!this.isLevelCompleted);
   }
 
   update(time: number, delta: number): void {
@@ -24,5 +23,7 @@ export class FinishGameState implements GameState {
   exit() {
     console.log("Exiting Finish Game State");
     // Additional logic for exiting the finish game state
+    this.game.gameUi.showNextLevelButton(false);
+    this.game.gameUi.showRestartLevelButton(false);
   }
 }

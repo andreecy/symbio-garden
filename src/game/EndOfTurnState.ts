@@ -14,8 +14,8 @@ export class EndOfTurnState implements GameState {
     // This could include displaying a summary of the turn, updating UI elements, etc.
 
     let isInsectArrived = false;
-    // insects count increases by 1 if turn is even (divisible by 2)
-    if (this.game.turn % 2 === 0) {
+    // insects count increases by 1 if turn is equal insect rate
+    if (this.game.turn % this.game.levelConfig.insectRate === 0) {
       isInsectArrived = true;
       this.game.addInsect();
     }
@@ -58,16 +58,28 @@ export class EndOfTurnState implements GameState {
       this.game.finishGame();
     } else {
       // check if level is complete
-      if (this.game.levelConfig.goal === "TURN") {
-        if (this.game.turn >= this.game.levelConfig.value) {
+      if (this.game.turn >= this.game.levelConfig.turns) {
+        // check if plant health is above minHp
+        if (this.game.plant.hp < this.game.levelConfig.minHp) {
+          const isDead = this.game.plant.hp <= 0;
+
           this.game.dialogUi.push(
-            `Level ${this.game.level} Complete\nYou have reached the goal of ${this.game.levelConfig.value} turns.\nYou have survived until now.`
+            `Game Over\nPlant ${
+              isDead
+                ? "has died"
+                : "health below " + this.game.levelConfig.minHp
+            }.\nYou failed to restore balance.`
           );
           this.game.dialogUi.show();
-          this.game.finishGame(true);
-          this.game.sound.play("levelup");
+          this.game.finishGame();
           return;
         }
+
+        this.game.dialogUi.push(`Level ${this.game.level} Complete`);
+        this.game.dialogUi.show();
+        this.game.finishGame(true);
+        this.game.sound.play("levelup");
+        return;
       }
       this.game.nextTurn();
     }

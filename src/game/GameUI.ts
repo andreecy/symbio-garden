@@ -18,6 +18,8 @@ export class GameUI {
   levelConfig: import("/home/anzz/dev/symbio-garden/src/level").LevelConfig;
   menuContainer: Phaser.GameObjects.Container;
   levelTitle: Phaser.GameObjects.BitmapText;
+  nextLevelButton: Phaser.GameObjects.BitmapText;
+  restartLevelButton: Phaser.GameObjects.BitmapText;
 
   constructor(private game: Game) {
     this.hp = 0;
@@ -241,6 +243,66 @@ export class GameUI {
       .setAlpha(0);
 
     this.menuContainer.add([menuTitleText, playButton]);
+
+    this.nextLevelButton = this.game.add
+      .bitmapText(
+        width - 8 - 64,
+        height - 8 - 64,
+        "pixelfontBold",
+        "Next Level >",
+        14
+      )
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerover", () => {
+        this.game.tweens.add({
+          targets: this.nextLevelButton,
+          duration: 200,
+          scale: 1.1,
+        });
+      })
+      .on("pointerout", () => {
+        this.game.tweens.add({
+          targets: this.nextLevelButton,
+          duration: 200,
+          scale: 1,
+        });
+      })
+      .on("pointerdown", () => {
+        this.game.sound.play("click");
+        this.game.nextLevel();
+      })
+      .setVisible(false);
+
+    this.restartLevelButton = this.game.add
+      .bitmapText(
+        width - 8 - 64,
+        height - 8 - 64,
+        "pixelfontBold",
+        "Restart Level",
+        14
+      )
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerover", () => {
+        this.game.tweens.add({
+          targets: this.restartLevelButton,
+          duration: 200,
+          scale: 1.1,
+        });
+      })
+      .on("pointerout", () => {
+        this.game.tweens.add({
+          targets: this.restartLevelButton,
+          duration: 200,
+          scale: 1,
+        });
+      })
+      .on("pointerdown", () => {
+        this.game.sound.play("click");
+        this.game.restartLevel();
+      })
+      .setVisible(false);
   }
 
   showMenuUi(isShow: boolean) {
@@ -253,6 +315,14 @@ export class GameUI {
 
   showActionButtons(show: boolean) {
     this.actionButtons.setVisible(show);
+  }
+
+  showNextLevelButton(show: boolean) {
+    this.nextLevelButton.setVisible(show);
+  }
+
+  showRestartLevelButton(show: boolean) {
+    this.restartLevelButton.setVisible(show);
   }
 
   setTooltip(
@@ -320,9 +390,14 @@ export class GameUI {
   }
 
   setLevel(level: number) {
-    this.levelConfig = levels[level - 1];
-    this.levelTitle.setText(`Level ${level}\n${this.levelConfig.description}`);
-    this.levelText.setText(`Level ${level}\n${this.levelConfig.description}`);
+    const config = levels[level - 1];
+    this.levelConfig = config;
+    this.levelTitle.setText(
+      `Level ${level}\n${config.title}\n${config.description}`
+    );
+    this.levelText.setText(
+      `Level ${level}\n${config.title}\n${config.description}`
+    );
 
     this.game.tweens.add({
       targets: this.levelTitle,
