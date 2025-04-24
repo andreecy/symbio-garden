@@ -97,13 +97,14 @@ export class GameUI {
       .setTint(0xeeeeee)
       .setInteractive({ useHandCursor: true })
       .on("pointerover", () => {
-        this.sprayButton.setTint(0xffffff);
-        // giveWaterText.setVisible(true);
-        this.game.tweens.add({
-          targets: this.sprayButton,
-          scale: 1.1,
-          duration: 100,
-        });
+        if (this.game.bioControlCount >= 5) {
+          this.sprayButton.setTint(0xffffff);
+          this.game.tweens.add({
+            targets: this.sprayButton,
+            scale: 1.1,
+            duration: 100,
+          });
+        }
 
         const x = this.sprayButton.getBounds().left - 4;
         const y = this.sprayButton.getBounds().top + 12;
@@ -124,8 +125,10 @@ export class GameUI {
         this.showTooltip(false);
       })
       .on("pointerdown", () => {
-        this.game.sound.play("click");
-        this.game.giveBioControl();
+        if (this.game.bioControlCount >= 5) {
+          this.game.sound.play("click");
+          this.game.giveBioControl();
+        }
       });
 
     // water button
@@ -135,13 +138,15 @@ export class GameUI {
       .setTint(0xeeeeee)
       .setInteractive({ useHandCursor: true })
       .on("pointerover", () => {
-        this.waterButton.setTint(0xffffff);
-        // giveWaterText.setVisible(true);
-        this.game.tweens.add({
-          targets: this.waterButton,
-          scale: 1.1,
-          duration: 100,
-        });
+        if (this.game.waterCount >= 10) {
+          this.waterButton.setTint(0xffffff);
+          // giveWaterText.setVisible(true);
+          this.game.tweens.add({
+            targets: this.waterButton,
+            scale: 1.1,
+            duration: 100,
+          });
+        }
 
         const x = this.waterButton.getBounds().left - 4;
         const y = this.waterButton.getBounds().top + 12;
@@ -163,8 +168,10 @@ export class GameUI {
         this.showTooltip(false);
       })
       .on("pointerdown", () => {
-        this.game.sound.play("click");
-        this.game.giveWater();
+        if (this.game.waterCount >= 10) {
+          this.game.sound.play("click");
+          this.game.giveWater();
+        }
       });
 
     // observe button
@@ -222,7 +229,7 @@ export class GameUI {
         this.tooltip.getBounds().left + 8,
         this.tooltip.getBounds().top + 8,
         "pixelfont",
-        "-"
+        "-",
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setOrigin(0, 0)
@@ -240,7 +247,7 @@ export class GameUI {
         height / 2 - 120,
         "pixelfontBold",
         "Level 1\nSurvive for 5 turns",
-        12
+        12,
       )
       .setCenterAlign()
       .setOrigin(0.5, 0.5)
@@ -256,7 +263,7 @@ export class GameUI {
         height / 2 - 120,
         "pixelfontBold",
         "Symbio Garden",
-        24
+        24,
       )
       .setOrigin(0.5, 0.5)
       .setAlpha(0);
@@ -307,7 +314,7 @@ export class GameUI {
         height - 8 - 64,
         "pixelfontBold",
         "Next Level >",
-        14
+        14,
       )
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
@@ -337,7 +344,7 @@ export class GameUI {
         height - 8 - 64,
         "pixelfontBold",
         "Restart Level",
-        14
+        14,
       )
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
@@ -388,7 +395,7 @@ export class GameUI {
     w: number,
     h: number,
     text: string,
-    origin?: { x: number; y: number }
+    origin?: { x: number; y: number },
   ) {
     if (origin) {
       this.tooltip.setOrigin(origin.x, origin.y);
@@ -399,7 +406,7 @@ export class GameUI {
     this.tooltipText
       .setPosition(
         this.tooltip.getBounds().left + 8,
-        this.tooltip.getBounds().top + 8
+        this.tooltip.getBounds().top + 8,
       )
       .setMaxWidth(this.tooltip.width - 16)
       .setText(text);
@@ -428,7 +435,7 @@ export class GameUI {
             onComplete: () => {
               this.hpBar.setAlpha(1);
               this.hpBar.setFillStyle(
-                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42
+                hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
               );
               this.hpText.setText(`${hp}/100`);
             },
@@ -438,7 +445,7 @@ export class GameUI {
     } else {
       this.hpBar.setSize(100 * (hp / 100), 10);
       this.hpBar.setFillStyle(
-        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42
+        hp > 50 ? 0x38c759 : hp <= 30 ? 0xff0000 : 0xffca42,
       );
       this.hpText.setText(`${hp}/100`);
     }
@@ -450,10 +457,10 @@ export class GameUI {
     const config = levels[level - 1];
     this.levelConfig = config;
     this.levelTitle.setText(
-      `Level ${level}\n${config.title}\n${config.description}`
+      `Level ${level}\n${config.title}\n${config.description}`,
     );
     this.levelText.setText(
-      `Level ${level}\n${config.title}\n${config.description}`
+      `Level ${level}\n${config.title}\n${config.description}`,
     );
 
     this.game.tweens.add({

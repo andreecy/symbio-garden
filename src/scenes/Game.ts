@@ -165,7 +165,7 @@ export class Game extends Scene {
   }
 
   startPlay() {
-    this.setLevel(2);
+    this.setLevel(1);
   }
 
   nextLevel() {
@@ -203,6 +203,8 @@ export class Game extends Scene {
     for (let i = 0; i < this.levelConfig.insect; i++) {
       this.addInsect();
     }
+    // bio control spray
+    this.bioControlCount = this.levelConfig.bioControl;
 
     // the game starts with player turn
     this.changeState(this.playerTurnState);

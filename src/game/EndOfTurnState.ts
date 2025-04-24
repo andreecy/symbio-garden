@@ -33,7 +33,7 @@ export class EndOfTurnState implements GameState {
     let lackOfWaterDamage = 0;
     // decrease plant health by -5 if plant health <= 50
     if (this.game.plant.hp <= 50) {
-      lackOfWaterDamage = 5;
+      lackOfWaterDamage = 3;
       this.game.plant.decreaseHp(lackOfWaterDamage);
       this.game.gameUi.setHp(this.game.plant.hp);
     }
@@ -46,7 +46,7 @@ export class EndOfTurnState implements GameState {
           lackOfWaterDamage > 0
             ? `Plant HP -${lackOfWaterDamage} due to lack of water.\n`
             : ""
-        }`
+        }`,
       );
       this.game.dialogUi.show();
     }
@@ -57,7 +57,7 @@ export class EndOfTurnState implements GameState {
 
     if (this.game.plant.hp <= 0) {
       this.game.dialogUi.push(
-        `Game Over\nPlant has died.\nYou failed to restore balance.`
+        `Game Over\nPlant has died.\nYou failed to restore balance.`,
       );
       this.game.dialogUi.show();
       this.game.finishGame();
@@ -73,7 +73,19 @@ export class EndOfTurnState implements GameState {
               isDead
                 ? "has died"
                 : "health below " + this.game.levelConfig.minHp
-            }.\nYou failed to restore balance.`
+            }.\nYou failed to restore balance.`,
+          );
+          this.game.dialogUi.show();
+          this.game.finishGame();
+          return;
+        }
+
+        if (
+          this.game.levelConfig.maxInsect > -1 && // insect count is limited
+          this.game.insects.length > this.game.levelConfig.maxInsect // insect count is over limit
+        ) {
+          this.game.dialogUi.push(
+            `Game Over\nInsects count over ${this.game.levelConfig.maxInsect}.\nYou failed to restore balance.`,
           );
           this.game.dialogUi.show();
           this.game.finishGame();
