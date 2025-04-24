@@ -22,6 +22,8 @@ export class GameUI {
   restartLevelButton: Phaser.GameObjects.BitmapText;
   sprayText: Phaser.GameObjects.BitmapText;
   sprayButton: Phaser.GameObjects.Image;
+  creditsContainer: Phaser.GameObjects.Container;
+  creditsTween: Phaser.Tweens.TweenChain;
 
   constructor(private game: Game) {
     this.hp = 0;
@@ -115,12 +117,14 @@ export class GameUI {
         this.showTooltip(true);
       })
       .on("pointerout", () => {
-        this.sprayButton.setTint(0xeeeeee);
-        this.game.tweens.add({
-          targets: this.sprayButton,
-          scale: 1,
-          duration: 100,
-        });
+        if (this.game.bioControlCount >= 5) {
+          this.sprayButton.setTint(0xeeeeee);
+          this.game.tweens.add({
+            targets: this.sprayButton,
+            scale: 1,
+            duration: 100,
+          });
+        }
 
         this.showTooltip(false);
       })
@@ -157,13 +161,15 @@ export class GameUI {
         this.showTooltip(true);
       })
       .on("pointerout", () => {
-        this.waterButton.setTint(0xeeeeee);
-        // giveWaterText.setVisible(false);
-        this.game.tweens.add({
-          targets: this.waterButton,
-          scale: 1,
-          duration: 100,
-        });
+        if (this.game.waterCount >= 10) {
+          this.waterButton.setTint(0xeeeeee);
+          // giveWaterText.setVisible(false);
+          this.game.tweens.add({
+            targets: this.waterButton,
+            scale: 1,
+            duration: 100,
+          });
+        }
 
         this.showTooltip(false);
       })
@@ -367,6 +373,62 @@ export class GameUI {
         this.game.restartLevel();
       })
       .setVisible(false);
+
+    // Credits
+    this.creditsContainer = this.game.add.container(0, 0).setDepth(20);
+    const thanksText = this.game.add
+      .bitmapText(
+        width / 2,
+        height / 2 - 120,
+        "pixelfont",
+        "Thanks for playing!",
+        18,
+      )
+      .setOrigin(0.5, 0.5);
+
+    const creditsTitleText = this.game.add
+      .bitmapText(
+        width / 2,
+        height / 2 - 80,
+        "pixelfontBold",
+        "Symbio Garden",
+        24,
+      )
+      .setOrigin(0.5, 0.5);
+
+    const creatorText = this.game.add
+      .bitmapText(
+        width / 2,
+        height - 80,
+        "pixelfont",
+        "Created by\nandreecy",
+        16,
+      )
+      .setOrigin(0.5, 0.5);
+
+    this.creditsContainer.add([thanksText, creditsTitleText, creatorText]);
+    this.creditsContainer.setY(height);
+
+    this.creditsTween = this.game.tweens
+      .chain({
+        targets: this.creditsContainer,
+        tweens: [
+          {
+            y: 0,
+            duration: 3000,
+          },
+          {
+            y: 0,
+            duration: 3000,
+            onComplete: () => {
+              this.creditsContainer.setY(height);
+              this.creditsContainer.setVisible(false);
+              this.game.changeState(this.game.menuGameState);
+            },
+          },
+        ],
+      })
+      .pause();
   }
 
   showMenuUi(isShow: boolean) {
@@ -387,6 +449,11 @@ export class GameUI {
 
   showRestartLevelButton(show: boolean) {
     this.restartLevelButton.setVisible(show);
+  }
+
+  showCreditsUi(show: boolean) {
+    this.creditsContainer.setVisible(show);
+    this.creditsTween.restart();
   }
 
   setTooltip(

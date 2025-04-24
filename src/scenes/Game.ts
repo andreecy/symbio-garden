@@ -11,14 +11,17 @@ import { ObserveState } from "../game/ObserveState";
 import { LevelConfig, levels } from "../level";
 import { MenuGameState } from "../game/MenuGameState";
 import { DialogUI } from "../game/DialogUI";
+import { GameCreditsState } from "../game/GameCreditsState";
 
 export class Game extends Scene {
   level: number;
   state: GameState;
   turn: number;
   plant: Plant;
-  waterCount: number;
+  _waterCount: number;
+  _bioControlCount: number;
   insects: Insect[];
+
   watterButton: Phaser.GameObjects.Image;
   endTurnButton: Phaser.GameObjects.Text;
   waterParticle: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -33,7 +36,28 @@ export class Game extends Scene {
   levelConfig: LevelConfig;
   menuGameState: any;
   dialogUi: DialogUI;
-  bioControlCount: number;
+  magnifyingGlass: Phaser.GameObjects.Image;
+  observingTween: Phaser.Tweens.TweenChain;
+  spray: Phaser.GameObjects.Image;
+  sprayTween: Phaser.Tweens.TweenChain;
+
+  get waterCount() {
+    return this._waterCount;
+  }
+
+  set waterCount(value) {
+    this._waterCount = value;
+    this.gameUi?.waterButton?.setTint(value < 10 ? 0x555555 : 0xeeeeee);
+  }
+
+  get bioControlCount() {
+    return this._bioControlCount;
+  }
+
+  set bioControlCount(value) {
+    this._bioControlCount = value;
+    this.gameUi?.sprayButton?.setTint(value < 5 ? 0x555555 : 0xeeeeee);
+  }
 
   constructor() {
     super("Game");
@@ -80,6 +104,7 @@ export class Game extends Scene {
     this.load.audio("watering", "audio/watering.mp3");
     this.load.audio("hit", "audio/hit.wav");
     this.load.audio("levelup", "audio/levelup.wav");
+    this.load.audio("spray", "audio/spray.mp3");
   }
 
   createWateringAnimation() {
@@ -143,6 +168,96 @@ export class Game extends Scene {
       .pause();
   }
 
+  createObservingAnimation() {
+    this.magnifyingGlass = this.add
+      .image(this.plant.x, this.plant.y, "observe")
+      .setDepth(10)
+      .setAlpha(0);
+
+    this.observingTween = this.tweens
+      .chain({
+        targets: this.magnifyingGlass,
+        persist: true,
+        tweens: [
+          {
+            alpha: 1,
+            duration: 300,
+          },
+          {
+            x: this.plant.x - 64,
+            y: this.plant.y - 24,
+            duration: 300,
+            // ease: "Power2",
+          },
+          {
+            x: this.plant.x - 64,
+            y: this.plant.y + 24,
+            duration: 300,
+            // ease: "Power2",
+          },
+          {
+            x: this.plant.x + 64,
+            y: this.plant.y - 24,
+            duration: 500,
+            // ease: "Power2",
+          },
+          {
+            x: this.plant.x + 64,
+            y: this.plant.y + 24,
+            duration: 300,
+            // ease: "Power2",
+          },
+          {
+            alpha: 0,
+            delay: 200,
+            duration: 300,
+            onComplete: () => {
+              // reset position
+              this.magnifyingGlass.setX(this.plant.x);
+              this.magnifyingGlass.setY(this.plant.y);
+            },
+          },
+        ],
+      })
+      .pause();
+  }
+
+  createSprayAnimation() {
+    this.spray = this.add
+      .image(this.plant.x + 24, this.plant.y - 12, "spray")
+      .setDepth(10)
+      .setAlpha(0);
+
+    this.sprayTween = this.tweens
+      .chain({
+        targets: this.spray,
+        persist: true,
+        tweens: [
+          {
+            alpha: 1,
+            duration: 300,
+          },
+          {
+            x: this.plant.x + 64,
+            y: this.plant.y,
+            duration: 800,
+            ease: "Power2",
+          },
+          {
+            alpha: 0,
+            delay: 200,
+            duration: 300,
+            onComplete: () => {
+              // reset position
+              this.spray.setX(this.plant.x + 24);
+              this.spray.setY(this.plant.y - 12);
+            },
+          },
+        ],
+      })
+      .pause();
+  }
+
   create() {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
@@ -156,16 +271,19 @@ export class Game extends Scene {
     this.gameUi.create();
     this.gameUi.showGameUi(false);
     this.createWateringAnimation();
+    this.createObservingAnimation();
+    this.createSprayAnimation();
 
     this.dialogUi.create();
 
     this.changeState(this.menuGameState);
     // this.startPlay();
-    // this.finishGame();
+    // this.finishGame(true);
+    // this.changeState(new GameCreditsState(this));
   }
 
   startPlay() {
-    this.setLevel(1);
+    this.setLevel(5);
   }
 
   nextLevel() {
@@ -269,6 +387,13 @@ export class Game extends Scene {
     }
     if (this.bioControlCount >= 5) {
       this.bioControlCount -= 5;
+      this.sound.play("spray", {
+        seek: 0.5,
+      });
+      this.sprayTween.restart();
+
+      const removedCount = Math.min(3, this.insects.length);
+
       // reduce insect count by 3
       for (let i = 0; i < 3; i++) {
         if (this.insects.length > 0) {
@@ -276,6 +401,13 @@ export class Game extends Scene {
           insect?.destroy();
         }
       }
+
+      this.time.addEvent({
+        delay: 500,
+        callback: () => {
+          this.dialogUi.push(`${removedCount} Insects ran away!`);
+        },
+      });
 
       this.time.addEvent({
         delay: 2000,
@@ -288,6 +420,7 @@ export class Game extends Scene {
 
   observe() {
     this.changeState(this.observeState);
+    this.observingTween.restart();
 
     this.time.addEvent({
       delay: 2000,

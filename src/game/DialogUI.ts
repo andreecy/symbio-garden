@@ -20,7 +20,7 @@ export class DialogUI {
         200,
         64,
         0x000000,
-        0.7
+        0.7,
       )
       .setOrigin(0.5, 1)
       .setDepth(50)
@@ -31,7 +31,7 @@ export class DialogUI {
         this.box.getBounds().left + 8,
         this.box.getBounds().top + 8,
         "pixelfont",
-        "-"
+        "-",
       )
       .setMaxWidth(this.box.width - 16)
       .setOrigin(0, 0)
@@ -44,7 +44,7 @@ export class DialogUI {
       }
 
       if (this.dialogs.length > 0) {
-        this.pop();
+        this.shift();
       } else {
         this.setVisible(false);
       }
@@ -71,21 +71,21 @@ export class DialogUI {
   }
 
   /**
-   * Add text to the stacks
+   * Add text to the queue
    *  */
   push(text: string) {
     this.dialogs.push(text);
   }
 
   /**
-   * Pop the last text from the stacks
+   * Get the first text from the queue
    */
 
-  pop() {
+  shift() {
     if (this.dialogs.length === 0) {
       return;
     }
-    const text = this.dialogs.pop();
+    const text = this.dialogs.shift();
     if (text) {
       this.text.setText("");
       this.currText = text;
@@ -97,7 +97,7 @@ export class DialogUI {
    * Pop the last text from the stacks and show it
    */
   show() {
-    this.pop();
+    this.shift();
     this.setVisible(true);
   }
 }
