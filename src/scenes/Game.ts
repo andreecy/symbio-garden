@@ -283,12 +283,13 @@ export class Game extends Scene {
   }
 
   startPlay() {
-    this.setLevel(5);
+    this.setLevel(1);
   }
 
   nextLevel() {
     if (this.level + 1 > levels.length) {
-      this.finishGame(true);
+      // show game credits
+      this.changeState(new GameCreditsState(this));
       return;
     }
 
@@ -408,6 +409,8 @@ export class Game extends Scene {
           this.dialogUi.push(`${removedCount} Insects ran away!`);
         },
       });
+
+      this.changeState(this.observeState);
 
       this.time.addEvent({
         delay: 2000,
